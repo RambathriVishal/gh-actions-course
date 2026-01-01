@@ -1,0 +1,14 @@
+name: 05-1-Event Filters and  Activity Types
+
+on:
+    pull_request:
+        types:
+            - closed
+        branches:
+            - main
+
+jobs:
+    echo:
+        runs-on: ubuntu-latest
+        steps:
+            - run : echo "This workflow was triggered by a pull_request event with a specific activity type and PR is closed"
