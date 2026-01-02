@@ -8,18 +8,22 @@ jobs:
   echo1:
     runs-on: ubuntu-latest
     steps:
-      -name: Print PM file
-       run: echo "${{github.event.pull_request.title}}"
-     - name: Print PM Label
+      - name: Print PM file
+        run: echo "${{ github.event.pull_request.title }}"
+
+      - name: Print PM Label
         run: |
-        cat << EOF
-        ${{toJSON(github.event.pull_request.labels}}
-        EOF
+          cat << EOF
+          ${{ toJSON(github.event.pull_request.labels) }}
+          EOF
+
       - name: Bug step
-        if: ${{!cancelled() && contains(github.event.pull_request.title,'fix')}}
-        run: echo " I am a bug fix"
+        if: ${{ !cancelled() && contains(github.event.pull_request.title, 'fix') }}
+        run: echo "I am a bug fix"
+
       - name: Sleep for 20 sec
-        run : sleep 20
+        run: sleep 20
+
       - name: Failed Step
         run: |
           echo "This step will fail"
@@ -40,4 +44,3 @@ jobs:
       - name: I will execute when cancelled
         if: ${{ cancelled() }}
         run: echo "I will be executed only if the workflow is cancelled"
-
