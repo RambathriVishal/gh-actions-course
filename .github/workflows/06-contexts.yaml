@@ -1,44 +1,46 @@
-name: 06 - Contexts
+name: 09-Using-Functions
 
-run-name: 06-Contexts | DEBUG - ${{ inputs.debug }}
-on: 
-  push:
+on:
+  pull_request:
   workflow_dispatch:
-    inputs:
-      debug:
-        type: boolean
-        default: false
 
 jobs:
-  echo-data:
-    runs-on: ubuntu-latest
-    env:
-      MY_JOB_VAR: 'job'
-      MY_OVERWRITTEN_VAR: 'job'
-    steps:
-      - name: Display information
-        run: |
-          echo "Repository: ${{ github.repository }}"
-          echo "Event Name: ${{ github.event_name }}"
-          echo "SHA: ${{ github.sha }}"
-          echo "Ref: ${{ github.ref }}"
-          echo "Actor: ${{ github.actor }}"
-          echo "Workflow: ${{ github.workflow }}"
-          echo "Job: ${{ github.job }}"
-
-      - name: Retrieve variable
-        run: |
-          echo "Variable value: ${{ vars.MY_VAR }}"
-
-      - name: Show environment variables
-        run: |
-          echo "Workflow env: ${{ env.WORKFLOW_VAR }}"
-          echo "Overwritten env: ${{ env.MY_OVERWRITTEN_VAR }}"
-
-  echo-data2:
+  echo1:
     runs-on: ubuntu-latest
     steps:
-      - name: Display information
+      - name: Print PM file
+        run: echo "${{ github.event.pull_request.title }}"
+
+      - name: Print PM Label
         run: |
-          echo "Workflow env: $WORKFLOW_VAR"
-          echo "Overwritten env: $MY_OVERWRITTEN_VAR"
+          cat << EOF
+          ${{ toJSON(github.event.pull_request.labels) }}
+          EOF
+
+      - name: Bug step
+        if: ${{ !cancelled() && contains(github.event.pull_request.title, 'fix') }}
+        run: echo "I am a bug fix"
+
+      - name: Sleep for 20 sec
+        run: sleep 20
+
+      - name: Failed Step
+        run: |
+          echo "This step will fail"
+          exit 1
+
+      - name: I will be skipped
+        if: ${{ success() }}
+        run: echo "I will be executed only if the previous step succeeded"
+
+      - name: I will execute
+        if: ${{ failure() }}
+        run: echo "I will be executed only if the previous step failed"
+
+      - name: I will execute
+        if: ${{ !cancelled() }}
+        run: echo "I will be always executed except if the workflow is not cancelled"
+
+      - name: I will execute when cancelled
+        if: ${{ cancelled() }}
+        run: echo "I will be executed only if the workflow is cancelled"
