@@ -14,7 +14,9 @@ jobs:
     build:
         runs-on: ubuntu-latest
         outputs:
-            build_output: ${{ steps.build.outputs.status }}
+        build-status : ${{ steps.build.outputs.status }}
+        output1: ${{ steps.build.outputs.output1 }}
+           
         steps:
           - name: Print GITHUB_OUTPUT path
             run: echo "$GITHUB_OUTPUT"
@@ -24,6 +26,13 @@ jobs:
             run: |
                 echo "$GITHUB_OUTPUT"
                 echo "status=${{ inputs.build_status }}" >> $GITHUB_OUTPUT
+                echo "output1=value1" >> "$GITHUB_OUTPUT"
+                echo "output2=value2" >> "$GITHUB_OUTPUT"
+                cat "$GITHUB_OUTPUT"
+          - name: Introduce step with mistake
+            run: |
+                echo "mistake=true" >> "$GITHUB_OUTPUT"
+                cat "$GITHUB_OUTPUT"
 
     deploy:
         runs-on: ubuntu-latest
@@ -32,3 +41,7 @@ jobs:
         steps:
           - name: Deploy
             run: echo "Deploying"
+          - name: Print outputs
+            run: |
+               echo "Output 1: ${{needs.build.outputs.output1}}"
+             
